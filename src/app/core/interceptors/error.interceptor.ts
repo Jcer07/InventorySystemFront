@@ -17,21 +17,25 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      switch (error.status) {
-        case 401:
-          router.navigate(['/auth/login']);
-          break;
-        case 403:
-          toastService.error(errorMapper.map('Common.Forbidden'));
-          break;
-        case 400: {
-          const domainError = error.error as DomainError;
-          const code = domainError?.code || 'Common.UnexpectedError';
-          toastService.error(errorMapper.map(code));
-          break;
+      const isSilentAuthRequest = req.url.includes('/auth/me') || req.url.includes('/auth/refresh');
+
+      if (!isSilentAuthRequest) {
+        switch (error.status) {
+          case 401:
+            router.navigate(['/auth/login']);
+            break;
+          case 403:
+            toastService.error(errorMapper.map('Common.Forbidden'));
+            break;
+          case 400: {
+            const domainError = error.error as DomainError;
+            const code = domainError?.code || 'Common.UnexpectedError';
+            toastService.error(errorMapper.map(code));
+            break;
+          }
+          default:
+            toastService.error(errorMapper.map('Common.UnexpectedError'));
         }
-        default:
-          toastService.error(errorMapper.map('Common.UnexpectedError'));
       }
 
       return throwError(() => error);

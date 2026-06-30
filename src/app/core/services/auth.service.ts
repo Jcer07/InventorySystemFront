@@ -1,15 +1,17 @@
-import { Service, signal } from '@angular/core';
-import { HttpErrorResponse } from '@angular/common/http';
-import { Observable, of, throwError, delay } from 'rxjs';
+import { Service, signal, inject } from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, of, throwError } from 'rxjs';
+import { map, catchError, tap } from 'rxjs/operators';
 
 export interface User {
-  id: string;
+  userId: string;
   email: string;
   role: string;
 }
 
 @Service()
 export class AuthService {
+  private readonly http = inject(HttpClient);
   private readonly userSignal = signal<User | null>(null);
   public readonly currentUser = this.userSignal.asReadonly();
 
@@ -18,59 +20,52 @@ export class AuthService {
   }
 
   /**
-   * Mock login. Accept only admin@example.com / password.
-   * Emulates a delay and throws HttpErrorResponse on failure to test error interceptors.
+   * Authenticates a user with the C# backend.
+   * On success, the backend sets HttpOnly cookies.
    */
   public login(credentials: { email: string; password: string }): Observable<User> {
-    if (credentials.email === 'admin@example.com' && credentials.password === 'password') {
-      const mockUser: User = {
-        id: '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d',
-        email: credentials.email,
-        role: 'Admin',
-      };
-
-      localStorage.setItem('mock-auth-user', JSON.stringify(mockUser));
-      this.userSignal.set(mockUser);
-
-      return of(mockUser).pipe(delay(800));
-    } else {
-      const errorResponse = new HttpErrorResponse({
-        error: {
-          code: 'Auth.InvalidCredentials',
-          message: 'Las credenciales son incorrectas.',
-        },
-        status: 400,
-        statusText: 'Bad Request',
-        url: '/api/auth/login',
-      });
-      return throwError(() => errorResponse).pipe(delay(800));
-    }
+    return this.http.post<User>('/api/auth/login', credentials).pipe(
+      tap(user => this.userSignal.set(user))
+    );
   }
 
   /**
-   * Mock logout. Clears the session state.
+   * Logs out the user and clears backend sessions and cookies.
    */
   public logout(): Observable<void> {
-    localStorage.removeItem('mock-auth-user');
-    this.userSignal.set(null);
-    return of(undefined).pipe(delay(500));
+    return this.http.post<void>('/api/auth/logout', {}).pipe(
+      tap(() => this.userSignal.set(null))
+    );
   }
 
   /**
-   * Mock status check. Persists session state on refresh.
+   * Verifies the user's active session.
+   * If the access token is expired, attempts to silently refresh it.
    */
   public checkStatus(): Observable<boolean> {
-    const saved = localStorage.getItem('mock-auth-user');
-    if (saved) {
-      try {
-        const user = JSON.parse(saved) as User;
+    return this.http.get<User>('/api/auth/me').pipe(
+      map(user => {
         this.userSignal.set(user);
-        return of(true);
-      } catch {
-        localStorage.removeItem('mock-auth-user');
-      }
-    }
-    this.userSignal.set(null);
-    return of(false);
+        return true;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        if (error.status === 401) {
+          // Access token expired, attempt to refresh the session using the refresh token cookie
+          return this.http.post<User>('/api/auth/refresh', {}).pipe(
+            map(user => {
+              this.userSignal.set(user);
+              return true;
+            }),
+            catchError(() => {
+              this.userSignal.set(null);
+              return of(false);
+            })
+          );
+        }
+
+        this.userSignal.set(null);
+        return of(false);
+      })
+    );
   }
 }
