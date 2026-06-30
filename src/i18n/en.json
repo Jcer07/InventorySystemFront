@@ -1,0 +1,62 @@
+{
+  "Common": {
+    "UnexpectedError": "An unexpected error occurred. Please try again.",
+    "Forbidden": "You do not have permission to perform this action.",
+    "Required": "This field is required.",
+    "InvalidEmail": "The email address is invalid.",
+    "MinLength": "Must be at least {min} characters.",
+    "Save": "Save",
+    "Cancel": "Cancel",
+    "Confirm": "Confirm",
+    "Back": "Back",
+    "Actions": "Actions",
+    "Loading": "Loading..."
+  },
+  "Auth": {
+    "Login": "Sign In",
+    "Logout": "Sign Out",
+    "Email": "Email Address",
+    "Password": "Password",
+    "SigningIn": "Signing in...",
+    "InvalidCredentials": "The credentials are incorrect."
+  },
+  "Product": {
+    "NotFound": "Product not found.",
+    "DuplicateSku": "A product with that SKU already exists.",
+    "InvalidSku": "The provided SKU is invalid.",
+    "InvalidQuantity": "Quantity must be greater than zero.",
+    "InsufficientStock": "Insufficient stock.",
+    "Title": "Products",
+    "Add": "New Product",
+    "Edit": "Edit Product",
+    "Name": "Name",
+    "Sku": "SKU",
+    "Stock": "Stock",
+    "MinStock": "Minimum Stock",
+    "Category": "Category",
+    "Unit": "Unit of Measure",
+    "Supplier": "Supplier",
+    "LowStockWarning": "Warning! Stock is below minimum.",
+    "NoProducts": "No products found."
+  },
+  "Stock": {
+    "Movement": "Stock Movement",
+    "Entry": "Entry",
+    "Exit": "Exit",
+    "Quantity": "Quantity",
+    "Notes": "Notes",
+    "Register": "Register Movement",
+    "History": "Movement History",
+    "Date": "Date",
+    "User": "User",
+    "Type": "Type"
+  },
+  "Dashboard": {
+    "Title": "Inventory Dashboard",
+    "TotalProducts": "Total Products",
+    "LowStock": "Products Under Minimum Stock",
+    "RecentMovements": "Recent Movements",
+    "NoRecentMovements": "No recent movements.",
+    "QuickActions": "Quick Actions"
+  }
+}

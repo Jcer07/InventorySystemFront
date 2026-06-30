@@ -1,0 +1,62 @@
+{
+  "Common": {
+    "UnexpectedError": "Ocurrió un error inesperado. Por favor, intente de nuevo.",
+    "Forbidden": "No tiene permisos para realizar esta acción.",
+    "Required": "Este campo es requerido.",
+    "InvalidEmail": "El correo electrónico no es válido.",
+    "MinLength": "Debe tener al menos {min} caracteres.",
+    "Save": "Guardar",
+    "Cancel": "Cancelar",
+    "Confirm": "Confirmar",
+    "Back": "Regresar",
+    "Actions": "Acciones",
+    "Loading": "Cargando..."
+  },
+  "Auth": {
+    "Login": "Iniciar Sesión",
+    "Logout": "Cerrar Sesión",
+    "Email": "Correo Electrónico",
+    "Password": "Contraseña",
+    "SigningIn": "Iniciando sesión...",
+    "InvalidCredentials": "Las credenciales son incorrectas."
+  },
+  "Product": {
+    "NotFound": "El producto no fue encontrado.",
+    "DuplicateSku": "Ya existe un producto con ese SKU.",
+    "InvalidSku": "El SKU proporcionado no es válido.",
+    "InvalidQuantity": "La cantidad debe ser mayor que cero.",
+    "InsufficientStock": "Stock insuficiente.",
+    "Title": "Productos",
+    "Add": "Nuevo Producto",
+    "Edit": "Editar Producto",
+    "Name": "Nombre",
+    "Sku": "SKU",
+    "Stock": "Stock",
+    "MinStock": "Stock Mínimo",
+    "Category": "Categoría",
+    "Unit": "Unidad de Medida",
+    "Supplier": "Proveedor",
+    "LowStockWarning": "¡Alerta! Stock bajo el mínimo.",
+    "NoProducts": "No se encontraron productos."
+  },
+  "Stock": {
+    "Movement": "Movimiento de Stock",
+    "Entry": "Entrada",
+    "Exit": "Salida",
+    "Quantity": "Cantidad",
+    "Notes": "Notas",
+    "Register": "Registrar Movimiento",
+    "History": "Historial de Movimientos",
+    "Date": "Fecha",
+    "User": "Usuario",
+    "Type": "Tipo"
+  },
+  "Dashboard": {
+    "Title": "Dashboard de Inventario",
+    "TotalProducts": "Total Productos",
+    "LowStock": "Productos Bajo Stock Mínimo",
+    "RecentMovements": "Movimientos Recientes",
+    "NoRecentMovements": "No hay movimientos recientes.",
+    "QuickActions": "Acciones Rápidas"
+  }
+}
