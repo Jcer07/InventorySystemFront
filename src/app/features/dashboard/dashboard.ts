@@ -1,202 +1,19 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { I18nService } from '../../core/services/i18n.service';
 import { AuthService } from '../../core/services/auth.service';
-import { ProductService, Product } from '../inventory/services/product.service';
-import { StockService, StockMovement } from '../inventory/services/stock.service';
+import { Product, ProductService } from '../inventory/services/product.service';
+import { StockMovement, StockService } from '../inventory/services/stock.service';
 import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-dashboard',
   imports: [RouterLink, DatePipe],
-  template: `
-    <div class="space-y-8 animate-fade-in">
-      <!-- Title & Greeting -->
-      <div class="flex flex-col gap-2">
-        <h1
-          class="text-3xl font-extrabold tracking-tight text-slate-100 bg-linear-to-r from-slate-100 to-slate-300 bg-clip-text"
-        >
-          {{ i18n.t('Dashboard.Title') }}
-        </h1>
-        <p class="text-slate-400 text-sm">
-          Bienvenido de nuevo,
-          <span class="text-indigo-400 font-semibold">{{ auth.currentUser()?.email }}</span>.
-        </p>
-      </div>
-
-      <!-- Quick Metrics Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Total Products Card -->
-        <div
-          class="bg-slate-900/40 border border-slate-800 backdrop-blur-sm p-6 rounded-2xl flex flex-col gap-2 shadow-lg hover:border-indigo-500/20 transition-all duration-200"
-        >
-          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">{{
-            i18n.t('Dashboard.TotalProducts')
-          }}</span>
-          @if (isLoading()) {
-            <span class="h-9 w-12 bg-slate-800 animate-pulse rounded-md mt-1"></span>
-          } @else {
-            <span class="text-3xl font-extrabold text-indigo-400">{{ totalProducts() }}</span>
-          }
-        </div>
-
-        <!-- Low Stock Card -->
-        <div
-          [class.border-amber-500\/30]="lowStockProducts() > 0"
-          [class.bg-amber-950\/10]="lowStockProducts() > 0"
-          class="bg-slate-900/40 border border-slate-800 backdrop-blur-sm p-6 rounded-2xl flex flex-col gap-2 shadow-lg hover:border-amber-500/30 transition-all duration-200"
-        >
-          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">{{
-            i18n.t('Dashboard.LowStock')
-          }}</span>
-          @if (isLoading()) {
-            <span class="h-9 w-12 bg-slate-800 animate-pulse rounded-md mt-1"></span>
-          } @else {
-            <span
-              [class.text-amber-500]="lowStockProducts() > 0"
-              [class.text-slate-400]="lowStockProducts() === 0"
-              class="text-3xl font-extrabold"
-            >
-              {{ lowStockProducts() }}
-            </span>
-          }
-        </div>
-
-        <!-- Total Movements Card -->
-        <div
-          class="bg-slate-900/40 border border-slate-800 backdrop-blur-sm p-6 rounded-2xl flex flex-col gap-2 shadow-lg hover:border-purple-500/20 transition-all duration-200"
-        >
-          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">{{
-            i18n.t('Stock.History')
-          }}</span>
-          @if (isLoading()) {
-            <span class="h-9 w-12 bg-slate-800 animate-pulse rounded-md mt-1"></span>
-          } @else {
-            <span class="text-3xl font-extrabold text-purple-400">{{ totalMovements() }}</span>
-          }
-        </div>
-      </div>
-
-      <!-- Main Layout Details -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Recent Movements Table -->
-        <div class="lg:col-span-2 bg-slate-900/60 border border-slate-800/80 backdrop-blur-md shadow-2xl rounded-2xl p-6 flex flex-col gap-4">
-          <div class="flex justify-between items-center">
-            <h3 class="text-lg font-bold text-slate-100">{{ i18n.t('Dashboard.RecentMovements') }}</h3>
-            <a routerLink="/inventory/stock" class="text-xs text-indigo-400 hover:text-indigo-300 font-semibold transition-colors">
-              Ver todos
-            </a>
-          </div>
-
-          @if (isLoading()) {
-            <div class="flex flex-col items-center justify-center py-10 gap-3">
-              <svg class="animate-spin h-6 w-6 text-indigo-500" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-            </div>
-          } @else {
-            @if (recentMovements().length === 0) {
-              <div class="flex flex-col items-center justify-center py-10 text-center">
-                <p class="text-xs text-slate-500">{{ i18n.t('Dashboard.NoRecentMovements') }}</p>
-              </div>
-            } @else {
-              <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                  <thead>
-                    <tr class="border-b border-slate-900 bg-slate-950/20 text-slate-500 text-[10px] font-bold uppercase tracking-wider">
-                      <th class="px-4 py-3">{{ i18n.t('Product.Name') }}</th>
-                      <th class="px-4 py-3">{{ i18n.t('Stock.Type') }}</th>
-                      <th class="px-4 py-3 text-right">{{ i18n.t('Stock.Quantity') }}</th>
-                      <th class="px-4 py-3">{{ i18n.t('Stock.Date') }}</th>
-                    </tr>
-                  </thead>
-                  <tbody class="divide-y divide-slate-900">
-                    @for (mov of recentMovements(); track mov.id) {
-                      <tr class="hover:bg-slate-900/10 transition-colors">
-                        <td class="px-4 py-3 text-xs">
-                          <div class="flex flex-col">
-                            <span class="font-bold text-slate-300">{{ mov.productName }}</span>
-                            <span class="text-[9px] text-slate-500 font-mono">{{ mov.sku }}</span>
-                          </div>
-                        </td>
-                        <td class="px-4 py-3">
-                          @if (mov.isEntry) {
-                            <span class="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/15">
-                              {{ i18n.t('Stock.Entry') }}
-                            </span>
-                          } @else {
-                            <span class="text-[10px] font-bold text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-full border border-rose-500/15">
-                              {{ i18n.t('Stock.Exit') }}
-                            </span>
-                          }
-                        </td>
-                        <td
-                          [class.text-emerald-400]="mov.isEntry"
-                          [class.text-rose-400]="!mov.isEntry"
-                          class="px-4 py-3 text-right font-extrabold text-xs"
-                        >
-                          {{ mov.isEntry ? '+' : '-' }}{{ mov.quantity }}
-                        </td>
-                        <td class="px-4 py-3 text-[10px] text-slate-500">
-                          {{ mov.createdAt | date: 'short' }}
-                        </td>
-                      </tr>
-                    }
-                  </tbody>
-                </table>
-              </div>
-            }
-          }
-        </div>
-
-        <!-- Quick Actions Panel -->
-        <div class="lg:col-span-1 bg-slate-900/60 border border-slate-800/80 backdrop-blur-md shadow-2xl rounded-2xl p-6 flex flex-col gap-4">
-          <h3 class="text-lg font-bold text-slate-100">{{ i18n.t('Dashboard.QuickActions') }}</h3>
-          
-          <div class="flex flex-col gap-3">
-            <a
-              routerLink="/inventory/products/new"
-              class="w-full p-4 bg-slate-950/80 border border-slate-800 hover:border-indigo-500/30 rounded-xl flex items-center gap-3.5 group transition-all duration-200 cursor-pointer"
-            >
-              <span class="p-2.5 bg-indigo-500/10 text-indigo-400 rounded-xl group-hover:bg-indigo-500/20 transition-all duration-200">
-                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                </svg>
-              </span>
-              <div class="flex flex-col text-left">
-                <span class="text-sm font-bold text-slate-200 group-hover:text-indigo-400 transition-colors">
-                  {{ i18n.t('Product.Add') }}
-                </span>
-                <span class="text-[11px] text-slate-500">Crea un nuevo producto en catálogo</span>
-              </div>
-            </a>
-
-            <a
-              routerLink="/inventory/stock"
-              class="w-full p-4 bg-slate-950/80 border border-slate-800 hover:border-purple-500/30 rounded-xl flex items-center gap-3.5 group transition-all duration-200 cursor-pointer"
-            >
-              <span class="p-2.5 bg-purple-500/10 text-purple-400 rounded-xl group-hover:bg-purple-500/20 transition-all duration-200">
-                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
-              </span>
-              <div class="flex flex-col text-left">
-                <span class="text-sm font-bold text-slate-200 group-hover:text-purple-400 transition-colors">
-                  {{ i18n.t('Stock.Register') }}
-                </span>
-                <span class="text-[11px] text-slate-500">Registrar ajuste de entradas o salidas</span>
-              </div>
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  `,
+  templateUrl: './dashboard.html',
 })
 export class DashboardComponent implements OnInit {
-  protected readonly i18n = inject(I18nService);
-  protected readonly auth = inject(AuthService);
+  protected readonly i18nService = inject(I18nService);
+  protected readonly authService = inject(AuthService);
   private readonly productService = inject(ProductService);
   private readonly stockService = inject(StockService);
 
@@ -205,9 +22,13 @@ export class DashboardComponent implements OnInit {
   protected readonly movements = signal<StockMovement[]>([]);
   protected readonly isLoading = signal(true);
 
+  protected readonly currentUser = this.authService.currentUser();
+
   // Computeds
   protected readonly totalProducts = computed(() => this.products().length);
-  protected readonly lowStockProducts = computed(() => this.products().filter(p => p.isLowStock).length);
+  protected readonly lowStockProducts = computed(
+    () => this.products().filter((p) => p.isLowStock).length,
+  );
   protected readonly totalMovements = computed(() => this.movements().length);
   protected readonly recentMovements = computed(() => this.movements().slice(0, 5));
 
@@ -221,16 +42,16 @@ export class DashboardComponent implements OnInit {
     this.productService.getAll().subscribe({
       next: (prods) => {
         this.products.set(prods);
-        
+
         this.stockService.getMovements().subscribe({
           next: (movs) => {
             this.movements.set(movs);
             this.isLoading.set(false);
           },
-          error: () => this.isLoading.set(false)
+          error: () => this.isLoading.set(false),
         });
       },
-      error: () => this.isLoading.set(false)
+      error: () => this.isLoading.set(false),
     });
   }
 }

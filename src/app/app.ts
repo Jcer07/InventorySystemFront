@@ -21,7 +21,18 @@ export class App {
   protected readonly i18n = inject(I18nService);
   private readonly router = inject(Router);
 
+  protected readonly isSidebarOpen = signal(false);
+
+  public toggleSidebar(): void {
+    this.isSidebarOpen.update((open) => !open);
+  }
+
+  public closeSidebar(): void {
+    this.isSidebarOpen.set(false);
+  }
+
   public logout(): void {
+    this.closeSidebar();
     this.auth.logout().subscribe({
       next: () => {
         this.router.navigate(['/auth/login']);
