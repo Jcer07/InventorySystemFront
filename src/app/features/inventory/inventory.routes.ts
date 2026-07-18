@@ -1,29 +1,8 @@
-import { Component } from '@angular/core';
 import { Routes } from '@angular/router';
-
-@Component({
-  selector: 'app-product-list',
-  template: 'Product List Placeholder',
-})
-class ProductListComponent {}
-
-@Component({
-  selector: 'app-product-form',
-  template: 'Product Form Placeholder',
-})
-class ProductFormComponent {}
-
-@Component({
-  selector: 'app-product-detail',
-  template: 'Product Detail Placeholder',
-})
-class ProductDetailComponent {}
-
-@Component({
-  selector: 'app-stock',
-  template: 'Stock Placeholder',
-})
-class StockComponent {}
+import { ProductListComponent } from './products/product-list/product-list';
+import { ProductFormComponent } from './products/product-form/product-form';
+import { ProductDetailComponent } from './products/product-detail/product-detail';
+import { StockComponent } from './stock/stock';
 
 export const routes: Routes = [
   { path: 'products', component: ProductListComponent },

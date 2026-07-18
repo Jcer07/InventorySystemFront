@@ -1,0 +1,201 @@
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div class="flex flex-col gap-1">
+      <h1 class="text-3xl font-extrabold tracking-tight bg-linear-to-r from-slate-100 to-slate-300 bg-clip-text text-transparent">
+        {{ i18n.t('Product.Title') }}
+      </h1>
+      <p class="text-slate-400 text-sm">
+        Gestiona y controla los productos del catálogo de inventario.
+      </p>
+    </div>
+    <a
+      routerLink="/inventory/products/new"
+      class="px-5 py-2.5 bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-sm font-semibold text-white rounded-xl shadow-lg hover:shadow-indigo-500/20 active:scale-[0.98] transition-all duration-200 cursor-pointer flex items-center gap-2"
+    >
+      <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+      </svg>
+      {{ i18n.t('Product.Add') }}
+    </a>
+  </div>
+
+  <!-- Filters Card -->
+  <div class="bg-slate-900/40 border border-slate-800/80 backdrop-blur-sm p-4 rounded-2xl shadow-lg flex flex-col md:flex-row gap-4 items-center justify-between">
+    <div class="flex flex-col md:flex-row gap-4 w-full md:w-auto flex-1">
+      <!-- Search -->
+      <div class="relative w-full md:max-w-md">
+        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </span>
+        <input
+          type="text"
+          [value]="searchQuery()"
+          (input)="onSearchChange($event)"
+          placeholder="Buscar por nombre, SKU o descripción..."
+          class="w-full bg-slate-950/80 border border-slate-800 focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/20 rounded-xl pl-11 pr-4 py-2.5 text-sm text-slate-200 placeholder-slate-500 focus:outline-none transition-all duration-200"
+        />
+      </div>
+
+      <!-- Category Filter -->
+      <div class="relative w-full md:w-56">
+        <select
+          (change)="onCategoryChange($event)"
+          class="w-full bg-slate-950/80 border border-slate-800 focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/20 rounded-xl px-4 py-2.5 text-sm text-slate-300 focus:outline-none transition-all duration-200 appearance-none cursor-pointer"
+        >
+          <option value="">{{ i18n.t('Product.Category') }}: Todas</option>
+          @for (cat of categories(); track cat.id) {
+            <option [value]="cat.id">{{ cat.name }}</option>
+          }
+        </select>
+        <span class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-500">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </span>
+      </div>
+    </div>
+
+    <!-- Low Stock Toggle -->
+    <button
+      (click)="toggleLowStockFilter()"
+      [class.bg-amber-500\/10]="filterLowStock()"
+      [class.border-amber-500\/30]="filterLowStock()"
+      [class.text-amber-400]="filterLowStock()"
+      [class.bg-slate-950\/80]="!filterLowStock()"
+      [class.border-slate-800]="!filterLowStock()"
+      [class.text-slate-400]="!filterLowStock()"
+      class="w-full md:w-auto border rounded-xl px-5 py-2.5 text-sm font-semibold flex items-center justify-center gap-2 hover:bg-slate-900 transition-all duration-200 cursor-pointer"
+    >
+      <span
+        [class.bg-amber-500]="filterLowStock()"
+        [class.bg-slate-700]="!filterLowStock()"
+        class="h-2 w-2 rounded-full"
+      ></span>
+      {{ i18n.t('Dashboard.LowStock') }}
+    </button>
+  </div>
+
+  <!-- Products List Card -->
+  <div class="bg-slate-900/40 border border-slate-800/80 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden">
+    @if (isLoading()) {
+      <div class="flex flex-col items-center justify-center py-20 gap-4">
+        <svg class="animate-spin h-10 w-10 text-indigo-500" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <p class="text-sm text-slate-400">{{ i18n.t('Common.Loading') }}</p>
+      </div>
+    } @else {
+      @if (filteredProducts().length === 0) {
+        <div class="flex flex-col items-center justify-center py-20 text-center px-4">
+          <div class="h-16 w-16 bg-slate-950 border border-slate-800 rounded-2xl flex items-center justify-center text-slate-600 mb-4">
+            <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-slate-200 mb-1">{{ i18n.t('Product.NoProducts') }}</h3>
+          <p class="text-sm text-slate-500 max-w-sm">No se encontraron productos que coincidan con los criterios de búsqueda.</p>
+        </div>
+      } @else {
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-900 bg-slate-950/20 text-slate-400 text-xs font-semibold uppercase tracking-wider">
+                <th class="px-6 py-4">{{ i18n.t('Product.Name') }}</th>
+                <th class="px-6 py-4">{{ i18n.t('Product.Sku') }}</th>
+                <th class="px-6 py-4">{{ i18n.t('Product.Category') }}</th>
+                <th class="px-6 py-4 text-right">{{ i18n.t('Product.Stock') }}</th>
+                <th class="px-6 py-4 text-right">{{ i18n.t('Product.MinStock') }}</th>
+                <th class="px-6 py-4 text-center">Estado</th>
+                <th class="px-6 py-4 text-right">{{ i18n.t('Common.Actions') }}</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-900 bg-slate-900/10">
+              @for (product of filteredProducts(); track product.id) {
+                <tr class="hover:bg-slate-900/30 transition-colors duration-150">
+                  <!-- Name -->
+                  <td class="px-6 py-4.5">
+                    <div class="flex flex-col">
+                      <span class="text-sm font-bold text-slate-200">{{ product.name }}</span>
+                      @if (product.description) {
+                        <span class="text-xs text-slate-500 truncate max-w-xs mt-0.5" [title]="product.description">
+                          {{ product.description }}
+                        </span>
+                      }
+                    </div>
+                  </td>
+                  <!-- SKU -->
+                  <td class="px-6 py-4.5">
+                    <code class="text-xs px-2 py-1 bg-slate-950/80 border border-slate-800 text-indigo-400 font-mono rounded-md">
+                      {{ product.sku }}
+                    </code>
+                  </td>
+                  <!-- Category & Unit -->
+                  <td class="px-6 py-4.5">
+                    <div class="flex flex-col gap-0.5">
+                      <span class="text-xs font-medium text-slate-300">{{ product.categoryName }}</span>
+                      <span class="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">
+                        {{ product.unitName }} ({{ product.unitAbbreviation }})
+                      </span>
+                    </div>
+                  </td>
+                  <!-- Stock -->
+                  <td class="px-6 py-4.5 text-right font-semibold text-slate-200">
+                    {{ product.stock }} <span class="text-slate-500 text-xs font-normal">{{ product.unitAbbreviation }}</span>
+                  </td>
+                  <!-- Min Stock -->
+                  <td class="px-6 py-4.5 text-right text-slate-400">
+                    {{ product.minStock }} <span class="text-slate-600 text-[10px]">{{ product.unitAbbreviation }}</span>
+                  </td>
+                  <!-- Status -->
+                  <td class="px-6 py-4.5 text-center">
+                    @if (product.isLowStock) {
+                      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                        <span class="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                        Stock Bajo
+                      </span>
+                    } @else {
+                      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                        <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                        Ok
+                      </span>
+                    }
+                  </td>
+                  <!-- Actions -->
+                  <td class="px-6 py-4.5 text-right">
+                    <div class="flex justify-end gap-1.5">
+                      <!-- Adjust Stock -->
+                      <button
+                        (click)="navigateToAdjustStock(product.id)"
+                        class="p-2 text-indigo-400 hover:text-indigo-300 hover:bg-indigo-950/20 rounded-lg transition-colors cursor-pointer"
+                        title="Ajustar Stock"
+                      >
+                        <svg class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                      </button>
+                      <!-- View Details -->
+                      <a
+                        [routerLink]="['/inventory/products', product.id]"
+                        class="p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 rounded-lg transition-colors cursor-pointer"
+                        title="Ver Detalles"
+                      >
+                        <svg class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+  </div>
+</div>

@@ -1,0 +1,193 @@
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex items-center gap-4">
+    <a
+      routerLink="/inventory/products"
+      class="p-2 bg-slate-900 border border-slate-800 rounded-xl text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
+      [title]="i18n.t('Common.Back')"
+    >
+      <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg>
+    </a>
+    <div class="flex flex-col">
+      <h1 class="text-3xl font-extrabold tracking-tight bg-linear-to-r from-slate-100 to-slate-300 bg-clip-text text-transparent">
+        Detalle del Producto
+      </h1>
+      <p class="text-slate-400 text-sm">
+        Ficha técnica e historial de movimientos del producto.
+      </p>
+    </div>
+  </div>
+
+  @if (isLoadingProduct()) {
+    <div class="flex flex-col items-center justify-center py-20 gap-4">
+      <svg class="animate-spin h-10 w-10 text-indigo-500" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <p class="text-sm text-slate-400">Cargando detalles...</p>
+    </div>
+  } @else {
+    @if (product(); as prod) {
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Product Card Details -->
+        <div class="lg:col-span-1 bg-slate-900/60 border border-slate-800/80 backdrop-blur-md shadow-2xl rounded-2xl p-6 flex flex-col gap-6 h-fit">
+          <div class="flex flex-col gap-1">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-widest font-mono">SKU: {{ prod.sku }}</span>
+            <h2 class="text-2xl font-bold text-slate-100">{{ prod.name }}</h2>
+          </div>
+
+          <!-- Low Stock Warning Alert -->
+          @if (prod.isLowStock) {
+            <div class="bg-amber-500/10 border border-amber-500/20 text-amber-400 rounded-xl p-4 flex gap-3 text-xs">
+              <svg class="h-5 w-5 shrink-0 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <div>
+                <p class="font-bold">{{ i18n.t('Product.LowStockWarning') }}</p>
+                <p class="text-slate-400 mt-0.5">El stock actual está por debajo del límite mínimo establecido.</p>
+              </div>
+            </div>
+          }
+
+          <!-- Attributes list -->
+          <div class="space-y-4">
+            <!-- Stock and Min Stock Info -->
+            <div class="grid grid-cols-2 gap-4">
+              <div class="bg-slate-950/80 border border-slate-800/50 p-4 rounded-xl flex flex-col gap-1">
+                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ i18n.t('Product.Stock') }}</span>
+                <span class="text-2xl font-extrabold text-indigo-400">{{ prod.stock }}</span>
+                <span class="text-[10px] text-slate-400">{{ prod.unitName }}</span>
+              </div>
+              <div class="bg-slate-950/80 border border-slate-800/50 p-4 rounded-xl flex flex-col gap-1">
+                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{{ i18n.t('Product.MinStock') }}</span>
+                <span class="text-2xl font-extrabold text-slate-400">{{ prod.minStock }}</span>
+                <span class="text-[10px] text-slate-400">{{ prod.unitName }}</span>
+              </div>
+            </div>
+
+            <!-- Meta attributes -->
+            <div class="space-y-3.5 border-t border-slate-900 pt-4 text-sm">
+              <div class="flex justify-between">
+                <span class="text-slate-500 font-medium">{{ i18n.t('Product.Category') }}</span>
+                <span class="text-slate-300 font-bold">{{ prod.categoryName }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500 font-medium">{{ i18n.t('Product.Unit') }}</span>
+                <span class="text-slate-300 font-bold">{{ prod.unitName }} ({{ prod.unitAbbreviation }})</span>
+              </div>
+              <div class="flex flex-col gap-1 pt-1.5 border-t border-slate-900/50">
+                <span class="text-slate-500 font-medium">{{ i18n.t('Product.Supplier') }}</span>
+                <span class="text-slate-300 font-bold text-xs truncate">{{ prod.supplierName || 'No asignado' }}</span>
+              </div>
+            </div>
+
+            <!-- Description -->
+            @if (prod.description) {
+              <div class="border-t border-slate-900 pt-4 flex flex-col gap-1">
+                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Descripción</span>
+                <p class="text-sm text-slate-400 bg-slate-950/40 p-3 rounded-xl border border-slate-800/40">
+                  {{ prod.description }}
+                </p>
+              </div>
+            }
+          </div>
+
+          <!-- Adjust Stock Action -->
+          <div class="border-t border-slate-900 pt-4">
+            <a
+              [routerLink]="['/inventory/stock']"
+              [queryParams]="{ productId: prod.id }"
+              class="w-full px-4 py-3 bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-sm font-semibold text-white rounded-xl shadow-lg hover:shadow-indigo-500/20 active:scale-[0.98] transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
+            >
+              <svg class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              {{ i18n.t('Stock.Register') }}
+            </a>
+          </div>
+        </div>
+
+        <!-- Product Movement History -->
+        <div class="lg:col-span-2 flex flex-col gap-6">
+          <div class="bg-slate-900/60 border border-slate-800/80 backdrop-blur-md shadow-2xl rounded-2xl p-6 flex flex-col gap-4">
+            <div class="flex justify-between items-center">
+              <h3 class="text-lg font-bold text-slate-100">{{ i18n.t('Stock.History') }}</h3>
+              <span class="text-xs text-slate-500">{{ movements().length }} movimientos registrados</span>
+            </div>
+
+            @if (isLoadingMovements()) {
+              <div class="flex flex-col items-center justify-center py-12 gap-4">
+                <svg class="animate-spin h-8 w-8 text-indigo-500" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <p class="text-sm text-slate-400">Cargando historial...</p>
+              </div>
+            } @else {
+              @if (movements().length === 0) {
+                <div class="flex flex-col items-center justify-center py-16 text-center">
+                  <div class="h-12 w-12 bg-slate-950 border border-slate-800 rounded-xl flex items-center justify-center text-slate-700 mb-3">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                  </div>
+                  <h4 class="text-sm font-semibold text-slate-300">No hay movimientos registrados</h4>
+                  <p class="text-xs text-slate-500 max-w-xs mt-1">Este producto aún no cuenta con entradas o salidas de inventario.</p>
+                </div>
+              } @else {
+                <div class="overflow-x-auto">
+                  <table class="w-full text-left border-collapse">
+                    <thead>
+                      <tr class="border-b border-slate-900 bg-slate-950/20 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+                        <th class="px-4 py-3">{{ i18n.t('Stock.Date') }}</th>
+                        <th class="px-4 py-3">{{ i18n.t('Stock.Type') }}</th>
+                        <th class="px-4 py-3 text-right">{{ i18n.t('Stock.Quantity') }}</th>
+                        <th class="px-4 py-3">{{ i18n.t('Stock.Notes') }}</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-900">
+                      @for (mov of movements(); track mov.id) {
+                        <tr class="hover:bg-slate-900/20 transition-colors">
+                          <!-- Date -->
+                          <td class="px-4 py-3 text-xs text-slate-400">
+                            {{ mov.createdAt | date: 'short' }}
+                          </td>
+                          <!-- Type -->
+                          <td class="px-4 py-3">
+                            @if (mov.isEntry) {
+                              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/15">
+                                {{ i18n.t('Stock.Entry') }}
+                              </span>
+                            } @else {
+                              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/15">
+                                {{ i18n.t('Stock.Exit') }}
+                              </span>
+                            }
+                          </td>
+                          <!-- Quantity -->
+                          <td
+                            [class.text-emerald-400]="mov.isEntry"
+                            [class.text-rose-400]="!mov.isEntry"
+                            class="px-4 py-3 text-right font-bold text-xs"
+                          >
+                            {{ mov.isEntry ? '+' : '-' }}{{ mov.quantity }}
+                          </td>
+                          <!-- Notes -->
+                          <td class="px-4 py-3 text-xs text-slate-300 max-w-[200px] truncate" [title]="mov.notes || ''">
+                            {{ mov.notes || '-' }}
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              }
+            }
+          </div>
+        </div>
+      </div>
+    }
+  }
+</div>
