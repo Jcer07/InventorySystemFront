@@ -1,10 +1,10 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { form, required, min, FormRoot, FormField } from '@angular/forms/signals';
-import { ProductService, CreateProduct } from '../../services/product.service';
-import { CatalogService, Category, Unit, Supplier } from '../../services/catalog.service';
-import { I18nService } from '../../../../core/services/i18n.service';
-import { ToastService } from '../../../../shared/components/toast/toast.service';
+import { form, FormField, FormRoot, min, required } from '@angular/forms/signals';
+import { CreateProduct, ProductService } from '@features/inventory/services/product.service';
+import { CatalogService, Category, Supplier, Unit } from '@features/inventory/services/catalog.service';
+import { I18nService } from '@core/services/i18n.service';
+import { ToastService } from '@shared/components/toast/toast.service';
 
 @Component({
   selector: 'app-product-form',
@@ -91,7 +91,7 @@ export class ProductFormComponent implements OnInit {
       next: () => {
         this.isSubmitting.set(false);
         this.toast.success('Producto creado exitosamente.');
-        this.router.navigate(['/inventory/products']);
+        void this.router.navigate(['/inventory/products']);
       },
       error: () => {
         this.isSubmitting.set(false);

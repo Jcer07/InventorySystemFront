@@ -1,9 +1,9 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
-import { ProductService, Product } from '../../services/product.service';
-import { CatalogService, Category } from '../../services/catalog.service';
-import { I18nService } from '../../../../core/services/i18n.service';
-import { ToastService } from '../../../../shared/components/toast/toast.service';
+import { ProductService, Product } from '@features/inventory/services/product.service';
+import { CatalogService, Category } from '@features/inventory/services/catalog.service';
+import { I18nService } from '@core/services/i18n.service';
+import { ToastService } from '@shared/components/toast/toast.service';
 
 @Component({
   selector: 'app-product-list',

@@ -1,11 +1,11 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { form, required, min, FormRoot, FormField } from '@angular/forms/signals';
-import { ProductService, Product } from '../services/product.service';
-import { StockService, StockMovement, AdjustStock } from '../services/stock.service';
-import { AuthService } from '../../../core/services/auth.service';
-import { I18nService } from '../../../core/services/i18n.service';
-import { ToastService } from '../../../shared/components/toast/toast.service';
+import { ProductService, Product } from '@features/inventory/services/product.service';
+import { StockService, StockMovement, AdjustStock } from '@features/inventory/services/stock.service';
+import { AuthService } from '@core/services/auth.service';
+import { I18nService } from '@core/services/i18n.service';
+import { ToastService } from '@shared/components/toast/toast.service';
 import { DatePipe } from '@angular/common';
 
 @Component({

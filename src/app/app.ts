@@ -1,9 +1,9 @@
 import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { AuthService } from './core/services/auth.service';
-import { I18nService } from './core/services/i18n.service';
-import { ToastComponent } from './shared/components/toast/toast';
-import { ConfirmDialogComponent } from './shared/components/confirm-dialog/confirm-dialog';
+import { AuthService } from '@core/services/auth.service';
+import { I18nService } from '@core/services/i18n.service';
+import { ToastComponent } from '@shared/components/toast/toast';
+import { ConfirmDialogComponent } from '@shared/components/confirm-dialog/confirm-dialog';
 
 @Component({
   selector: 'app-root',

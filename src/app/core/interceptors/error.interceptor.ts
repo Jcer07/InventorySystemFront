@@ -2,8 +2,8 @@ import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
-import { ToastService } from '../../shared/components/toast/toast.service';
-import { ErrorMapperService } from '../../shared/utils/error-mapper';
+import { ToastService } from '@shared/components/toast/toast.service';
+import { ErrorMapperService } from '@shared/utils/error-mapper';
 
 export interface DomainError {
   code: string;

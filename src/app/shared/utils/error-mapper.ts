@@ -1,5 +1,5 @@
 import { Service, inject } from '@angular/core';
-import { I18nService } from '../../core/services/i18n.service';
+import { I18nService } from '@core/services/i18n.service';
 
 @Service()
 export class ErrorMapperService {

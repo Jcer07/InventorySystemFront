@@ -1,9 +1,9 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { I18nService } from '../../core/services/i18n.service';
-import { AuthService } from '../../core/services/auth.service';
-import { Product, ProductService } from '../inventory/services/product.service';
-import { StockMovement, StockService } from '../inventory/services/stock.service';
+import { I18nService } from '@core/services/i18n.service';
+import { AuthService } from '@core/services/auth.service';
+import { Product, ProductService } from '@features/inventory/services/product.service';
+import { StockMovement, StockService } from '@features/inventory/services/stock.service';
 import { DatePipe } from '@angular/common';
 
 @Component({

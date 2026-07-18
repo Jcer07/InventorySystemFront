@@ -1,9 +1,9 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { ProductService, Product } from '../../services/product.service';
-import { StockService, StockMovement } from '../../services/stock.service';
-import { I18nService } from '../../../../core/services/i18n.service';
-import { ToastService } from '../../../../shared/components/toast/toast.service';
+import { ProductService, Product } from '@features/inventory/services/product.service';
+import { StockService, StockMovement } from '@features/inventory/services/stock.service';
+import { I18nService } from '@core/services/i18n.service';
+import { ToastService } from '@shared/components/toast/toast.service';
 import { DatePipe } from '@angular/common';
 
 @Component({
