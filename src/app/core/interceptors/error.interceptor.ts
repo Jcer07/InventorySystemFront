@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { ToastService } from '@shared/components/toast/toast.service';
 import { ErrorMapperService } from '@shared/utils/error-mapper';
+import { AuthService } from '@core/services/auth.service';
 
 export interface DomainError {
   code: string;
@@ -14,6 +15,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const toastService = inject(ToastService);
   const errorMapper = inject(ErrorMapperService);
+  const authService = inject(AuthService);
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
@@ -22,6 +24,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       if (!isSilentAuthRequest) {
         switch (error.status) {
           case 401:
+            authService.clearSession();
             router.navigate(['/auth/login']);
             break;
           case 403:

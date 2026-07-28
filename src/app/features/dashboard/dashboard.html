@@ -65,6 +65,33 @@
   </div>
 </div>
 
+  <!-- Charts Section -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Doughnut Chart Card -->
+    <div class="bg-slate-900/60 border border-slate-800/80 backdrop-blur-md shadow-2xl rounded-2xl p-6 flex flex-col gap-4">
+      <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider">Distribución de Stock por Categoría</h3>
+      <div class="relative h-64 flex items-center justify-center">
+        @if (isLoading()) {
+          <span class="h-full w-full bg-slate-950 animate-pulse rounded-md"></span>
+        } @else {
+          <canvas id="categoryChart"></canvas>
+        }
+      </div>
+    </div>
+    
+    <!-- Bar Chart Card -->
+    <div class="bg-slate-900/60 border border-slate-800/80 backdrop-blur-md shadow-2xl rounded-2xl p-6 flex flex-col gap-4">
+      <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider">Historial de Ajustes de Stock</h3>
+      <div class="relative h-64 flex items-center justify-center">
+        @if (isLoading()) {
+          <span class="h-full w-full bg-slate-950 animate-pulse rounded-md"></span>
+        } @else {
+          <canvas id="movementChart"></canvas>
+        }
+      </div>
+    </div>
+  </div>
+
 <!-- Main Layout Details -->
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
   <!-- Recent Movements Table -->

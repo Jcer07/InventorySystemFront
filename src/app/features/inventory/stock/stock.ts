@@ -21,6 +21,8 @@ export class StockComponent implements OnInit {
   protected readonly i18n = inject(I18nService);
   private readonly toast = inject(ToastService);
 
+  protected readonly isAdminOrManager = computed(() => this.auth.isAdminOrManager());
+
   // States
   protected readonly products = signal<Product[]>([]);
   protected readonly movements = signal<StockMovement[]>([]);
@@ -77,9 +79,9 @@ export class StockComponent implements OnInit {
 
   protected loadProducts(): void {
     this.isLoadingProducts.set(true);
-    this.productService.getAll().subscribe({
+    this.productService.getAll(1, 1000).subscribe({
       next: (prods) => {
-        this.products.set(prods);
+        this.products.set(prods.items);
         this.isLoadingProducts.set(false);
       },
       error: () => {
@@ -125,6 +127,11 @@ export class StockComponent implements OnInit {
     const currentUser = this.auth.currentUser();
     if (!currentUser) {
       this.toast.error('Sesión no válida. Inicie sesión de nuevo.');
+      return;
+    }
+
+    if (!this.auth.isAdminOrManager()) {
+      this.toast.error('No tienes permisos de escritura para registrar movimientos de stock.');
       return;
     }
 

@@ -12,10 +12,10 @@
     </a>
     <div class="flex flex-col">
       <h1 class="text-3xl font-extrabold tracking-tight bg-linear-to-r from-slate-100 to-slate-300 bg-clip-text text-transparent">
-        {{ i18n.t('Product.Add') }}
+        {{ isEdit() ? 'Editar Producto' : i18n.t('Product.Add') }}
       </h1>
       <p class="text-slate-400 text-sm">
-        Registra un nuevo producto en el catálogo.
+        {{ isEdit() ? 'Modifica los detalles del producto seleccionado.' : 'Registra un nuevo producto en el catálogo.' }}
       </p>
     </div>
   </div>

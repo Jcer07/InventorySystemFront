@@ -19,6 +19,15 @@ export class AuthService {
     return this.userSignal() !== null;
   }
 
+  public clearSession(): void {
+    this.userSignal.set(null);
+  }
+
+  public isAdminOrManager(): boolean {
+    const role = this.userSignal()?.role;
+    return role === 'Admin' || role === 'Manager';
+  }
+
   /**
    * Authenticates a user with the C# backend.
    * On success, the backend sets HttpOnly cookies.

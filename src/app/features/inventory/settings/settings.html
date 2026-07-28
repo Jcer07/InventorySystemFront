@@ -1,0 +1,475 @@
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col gap-1">
+    <h1 class="text-3xl font-extrabold tracking-tight bg-linear-to-r from-slate-100 to-slate-300 bg-clip-text text-transparent">
+      Configuración de Catálogos
+    </h1>
+    <p class="text-slate-400 text-sm">
+      Gestiona las categorías, unidades de medida y proveedores que estructuran los productos.
+    </p>
+  </div>
+
+  <!-- Tab Buttons Navigation -->
+  <div class="flex border-b border-slate-900 bg-slate-900/20 p-1.5 rounded-xl backdrop-blur-sm gap-1 w-full md:max-w-md">
+    <button
+      (click)="selectTab('categories')"
+      [class.bg-indigo-950/60]="activeTab() === 'categories'"
+      [class.text-white]="activeTab() === 'categories'"
+      [class.border-indigo-800/80]="activeTab() === 'categories'"
+      [class.text-slate-400]="activeTab() !== 'categories'"
+      class="flex-1 py-2 px-3 border border-transparent hover:text-slate-200 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer text-center"
+    >
+      Categorías
+    </button>
+    <button
+      (click)="selectTab('units')"
+      [class.bg-indigo-950/60]="activeTab() === 'units'"
+      [class.text-white]="activeTab() === 'units'"
+      [class.border-indigo-800/80]="activeTab() === 'units'"
+      [class.text-slate-400]="activeTab() !== 'units'"
+      class="flex-1 py-2 px-3 border border-transparent hover:text-slate-200 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer text-center"
+    >
+      Unidades
+    </button>
+    <button
+      (click)="selectTab('suppliers')"
+      [class.bg-indigo-950/60]="activeTab() === 'suppliers'"
+      [class.text-white]="activeTab() === 'suppliers'"
+      [class.border-indigo-800/80]="activeTab() === 'suppliers'"
+      [class.text-slate-400]="activeTab() !== 'suppliers'"
+      class="flex-1 py-2 px-3 border border-transparent hover:text-slate-200 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer text-center"
+    >
+      Proveedores
+    </button>
+  </div>
+
+  @if (isLoading()) {
+    <div class="flex flex-col items-center justify-center py-20 gap-4">
+      <svg class="animate-spin h-10 w-10 text-indigo-500" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <p class="text-sm text-slate-400">Cargando catálogos...</p>
+    </div>
+  } @else {
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- ── COLUMN 1: Add form card (only visible if admin/manager) ── -->
+      <div class="lg:col-span-1">
+        @if (isAdminOrManager()) {
+          <div class="bg-slate-900/60 border border-slate-800/80 backdrop-blur-md shadow-2xl rounded-2xl p-6 flex flex-col gap-5">
+            <h2 class="text-lg font-bold text-slate-200">
+              @if (activeTab() === 'categories') { Crear Categoría }
+              @if (activeTab() === 'units') { Crear Unidad de Medida }
+              @if (activeTab() === 'suppliers') { Registrar Proveedor }
+            </h2>
+
+            <!-- Categories Add Form -->
+            @if (activeTab() === 'categories') {
+              <div class="flex flex-col gap-4">
+                <div class="flex flex-col gap-1.5">
+                  <label for="newCatName" class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Nombre *</label>
+                  <input
+                    id="newCatName"
+                    type="text"
+                    [value]="newCategoryName()"
+                    (input)="newCategoryName.set($any($event.target).value)"
+                    placeholder="Ej. Tecnología"
+                    class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/30 transition-all"
+                  />
+                </div>
+                <button
+                  (click)="createCategory()"
+                  class="w-full py-3 bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-sm font-semibold text-white rounded-xl shadow-lg active:scale-[0.98] transition cursor-pointer flex items-center justify-center gap-1"
+                >
+                  Guardar Categoría
+                </button>
+              </div>
+            }
+
+            <!-- Units Add Form -->
+            @if (activeTab() === 'units') {
+              <div class="flex flex-col gap-4">
+                <div class="flex flex-col gap-1.5">
+                  <label for="newUnitName" class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Nombre *</label>
+                  <input
+                    id="newUnitName"
+                    type="text"
+                    [value]="newUnitName()"
+                    (input)="newUnitName.set($any($event.target).value)"
+                    placeholder="Ej. Kilogramo"
+                    class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/30 transition-all"
+                  />
+                </div>
+                <div class="flex flex-col gap-1.5">
+                  <label for="newUnitAbbrev" class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Abreviatura *</label>
+                  <input
+                    id="newUnitAbbrev"
+                    type="text"
+                    [value]="newUnitAbbrev()"
+                    (input)="newUnitAbbrev.set($any($event.target).value)"
+                    placeholder="Ej. kg"
+                    class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/30 transition-all"
+                  />
+                </div>
+                <button
+                  (click)="createUnit()"
+                  class="w-full py-3 bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-sm font-semibold text-white rounded-xl shadow-lg active:scale-[0.98] transition cursor-pointer flex items-center justify-center"
+                >
+                  Guardar Unidad
+                </button>
+              </div>
+            }
+
+            <!-- Suppliers Add Form -->
+            @if (activeTab() === 'suppliers') {
+              <div class="flex flex-col gap-4">
+                <div class="flex flex-col gap-1.5">
+                  <label for="newSupName" class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Nombre / Empresa *</label>
+                  <input
+                    id="newSupName"
+                    type="text"
+                    [value]="newSupplierName()"
+                    (input)="newSupplierName.set($any($event.target).value)"
+                    placeholder="Ej. Distribuidora Global"
+                    class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/30 transition-all"
+                  />
+                </div>
+                <div class="flex flex-col gap-1.5">
+                  <label for="newSupEmail" class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Correo de Contacto *</label>
+                  <input
+                    id="newSupEmail"
+                    type="email"
+                    [value]="newSupplierEmail()"
+                    (input)="newSupplierEmail.set($any($event.target).value)"
+                    placeholder="Ej. ventas@distribuidora.com"
+                    class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/30 transition-all"
+                  />
+                </div>
+                <button
+                  (click)="createSupplier()"
+                  class="w-full py-3 bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-sm font-semibold text-white rounded-xl shadow-lg active:scale-[0.98] transition cursor-pointer flex items-center justify-center"
+                >
+                  Registrar Proveedor
+                </button>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 text-slate-500 text-xs font-semibold">
+            Solo los administradores o editores autorizados pueden registrar o modificar catálogos.
+          </div>
+        }
+      </div>
+
+      <!-- ── COLUMN 2-3: Catalog Tables Listing ── -->
+      <div class="lg:col-span-2">
+        <div class="bg-slate-900/40 border border-slate-800/80 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden">
+          
+          <!-- Categories Tab View -->
+          @if (activeTab() === 'categories') {
+            @if (categories().length === 0) {
+              <div class="py-16 text-center text-slate-500 text-sm">No hay categorías registradas.</div>
+            } @else {
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead>
+                    <tr class="border-b border-slate-900 bg-slate-950/20 text-slate-400 text-xs font-semibold uppercase tracking-wider">
+                      <th class="px-6 py-4">ID</th>
+                      <th class="px-6 py-4">Nombre</th>
+                      <th class="px-6 py-4 text-center">Estado</th>
+                      @if (isAdminOrManager()) {
+                        <th class="px-6 py-4 text-right">Acciones</th>
+                      }
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-900 bg-slate-900/10">
+                    @for (cat of categories(); track cat.id) {
+                      <tr class="hover:bg-slate-900/30 transition-all">
+                        <td class="px-6 py-4 text-slate-400 font-mono text-xs">{{ cat.id }}</td>
+                        <td class="px-6 py-4">
+                          @if (editingCategoryId() === cat.id) {
+                            <input
+                              type="text"
+                              [value]="editingCategoryName()"
+                              (input)="editingCategoryName.set($any($event.target).value)"
+                              class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
+                            />
+                          } @else {
+                            <span class="text-sm font-bold text-slate-200" [class.line-through]="!cat.isActive" [class.text-slate-500]="!cat.isActive">
+                              {{ cat.name }}
+                            </span>
+                          }
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                          <span
+                            [class.bg-emerald-500\/10]="cat.isActive"
+                            [class.text-emerald-400]="cat.isActive"
+                            [class.border-emerald-500\/20]="cat.isActive"
+                            [class.bg-slate-800]="!cat.isActive"
+                            [class.text-slate-400]="!cat.isActive"
+                            [class.border-slate-700]="!cat.isActive"
+                            class="inline-flex px-2.5 py-1 rounded-full text-xs font-bold border"
+                          >
+                            {{ cat.isActive ? 'Activa' : 'Inactiva' }}
+                          </span>
+                        </td>
+                        @if (isAdminOrManager()) {
+                          <td class="px-6 py-4 text-right">
+                            <div class="flex justify-end gap-1.5">
+                              @if (editingCategoryId() === cat.id) {
+                                <button (click)="saveCategory(cat)" class="p-1.5 text-emerald-400 hover:bg-emerald-950/20 rounded-lg cursor-pointer" title="Guardar Cambios">
+                                  <svg class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                  </svg>
+                                </button>
+                                <button (click)="cancelEdit()" class="p-1.5 text-slate-400 hover:bg-slate-850 rounded-lg cursor-pointer" title="Cancelar">
+                                  <svg class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                  </svg>
+                                </button>
+                              } @else {
+                                <button (click)="startEditCategory(cat)" class="p-1.5 text-amber-500 hover:bg-amber-950/20 rounded-lg cursor-pointer" title="Editar Nombre">
+                                  <svg class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                  </svg>
+                                </button>
+                                <button (click)="toggleCategoryActive(cat)" class="p-1.5 rounded-lg cursor-pointer" [class.text-rose-500]="cat.isActive" [class.hover:bg-rose-950\/20]="cat.isActive" [class.text-emerald-500]="!cat.isActive" [class.hover:bg-emerald-950\/20]="!cat.isActive" [title]="cat.isActive ? 'Desactivar Categoría' : 'Activar Categoría'">
+                                  @if (cat.isActive) {
+                                    <svg class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                      <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                                    </svg>
+                                  } @else {
+                                    <svg class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                  }
+                                </button>
+                              }
+                            </div>
+                          </td>
+                        }
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+          }
+
+          <!-- Units Tab View -->
+          @if (activeTab() === 'units') {
+            @if (units().length === 0) {
+              <div class="py-16 text-center text-slate-500 text-sm">No hay unidades registradas.</div>
+            } @else {
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead>
+                    <tr class="border-b border-slate-900 bg-slate-950/20 text-slate-400 text-xs font-semibold uppercase tracking-wider">
+                      <th class="px-6 py-4">ID</th>
+                      <th class="px-6 py-4">Nombre</th>
+                      <th class="px-6 py-4">Abrev</th>
+                      <th class="px-6 py-4 text-center">Estado</th>
+                      @if (isAdminOrManager()) {
+                        <th class="px-6 py-4 text-right">Acciones</th>
+                      }
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-900 bg-slate-900/10">
+                    @for (u of units(); track u.id) {
+                      <tr class="hover:bg-slate-900/30 transition-all">
+                        <td class="px-6 py-4 text-slate-400 font-mono text-xs">{{ u.id }}</td>
+                        <td class="px-6 py-4">
+                          @if (editingUnitId() === u.id) {
+                            <input
+                              type="text"
+                              [value]="editingUnitName()"
+                              (input)="editingUnitName.set($any($event.target).value)"
+                              class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
+                            />
+                          } @else {
+                            <span class="text-sm font-bold text-slate-200" [class.line-through]="!u.isActive" [class.text-slate-500]="!u.isActive">
+                              {{ u.name }}
+                            </span>
+                          }
+                        </td>
+                        <td class="px-6 py-4">
+                          @if (editingUnitId() === u.id) {
+                            <input
+                              type="text"
+                              [value]="editingUnitAbbrev()"
+                              (input)="editingUnitAbbrev.set($any($event.target).value)"
+                              class="bg-slate-950 border border-slate-800 rounded-lg px-2 py-1.5 text-xs font-mono text-indigo-400 focus:outline-none focus:border-indigo-500 w-16"
+                            />
+                          } @else {
+                            <code class="text-xs px-2 py-1 bg-slate-950 border border-slate-850 text-indigo-400 font-mono rounded-md">
+                              {{ u.abbreviation }}
+                            </code>
+                          }
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                          <span
+                            [class.bg-emerald-500\/10]="u.isActive"
+                            [class.text-emerald-400]="u.isActive"
+                            [class.border-emerald-500\/20]="u.isActive"
+                            [class.bg-slate-800]="!u.isActive"
+                            [class.text-slate-400]="!u.isActive"
+                            [class.border-slate-700]="!u.isActive"
+                            class="inline-flex px-2.5 py-1 rounded-full text-xs font-bold border"
+                          >
+                            {{ u.isActive ? 'Activa' : 'Inactiva' }}
+                          </span>
+                        </td>
+                        @if (isAdminOrManager()) {
+                          <td class="px-6 py-4 text-right">
+                            <div class="flex justify-end gap-1.5">
+                              @if (editingUnitId() === u.id) {
+                                <button (click)="saveUnit(u)" class="p-1.5 text-emerald-400 hover:bg-emerald-950/20 rounded-lg cursor-pointer" title="Guardar Cambios">
+                                  <svg class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                  </svg>
+                                </button>
+                                <button (click)="cancelEdit()" class="p-1.5 text-slate-400 hover:bg-slate-850 rounded-lg cursor-pointer" title="Cancelar">
+                                  <svg class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                  </svg>
+                                </button>
+                              } @else {
+                                <button (click)="startEditUnit(u)" class="p-1.5 text-amber-500 hover:bg-amber-950/20 rounded-lg cursor-pointer" title="Editar Unidad">
+                                  <svg class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                  </svg>
+                                </button>
+                                <button (click)="toggleUnitActive(u)" class="p-1.5 rounded-lg cursor-pointer" [class.text-rose-500]="u.isActive" [class.hover:bg-rose-950\/20]="u.isActive" [class.text-emerald-500]="!u.isActive" [class.hover:bg-emerald-950\/20]="!u.isActive" [title]="u.isActive ? 'Desactivar Unidad' : 'Activar Unidad'">
+                                  @if (u.isActive) {
+                                    <svg class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                      <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                                    </svg>
+                                  } @else {
+                                    <svg class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                  }
+                                </button>
+                              }
+                            </div>
+                          </td>
+                        }
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+          }
+
+          <!-- Suppliers Tab View -->
+          @if (activeTab() === 'suppliers') {
+            @if (suppliers().length === 0) {
+              <div class="py-16 text-center text-slate-500 text-sm">No hay proveedores registrados.</div>
+            } @else {
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead>
+                    <tr class="border-b border-slate-900 bg-slate-950/20 text-slate-400 text-xs font-semibold uppercase tracking-wider">
+                      <th class="px-6 py-4">Nombre / Empresa</th>
+                      <th class="px-6 py-4">Correo</th>
+                      <th class="px-6 py-4 text-center">Estado</th>
+                      @if (isAdminOrManager()) {
+                        <th class="px-6 py-4 text-right">Acciones</th>
+                      }
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-900 bg-slate-900/10">
+                    @for (s of suppliers(); track s.id) {
+                      <tr class="hover:bg-slate-900/30 transition-all">
+                        <td class="px-6 py-4">
+                          @if (editingSupplierId() === s.id) {
+                            <input
+                              type="text"
+                              [value]="editingSupplierName()"
+                              (input)="editingSupplierName.set($any($event.target).value)"
+                              class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
+                            />
+                          } @else {
+                            <span class="text-sm font-bold text-slate-200" [class.line-through]="!s.isActive" [class.text-slate-500]="!s.isActive">
+                              {{ s.name }}
+                            </span>
+                          }
+                        </td>
+                        <td class="px-6 py-4">
+                          @if (editingSupplierId() === s.id) {
+                            <input
+                              type="email"
+                              [value]="editingSupplierEmail()"
+                              (input)="editingSupplierEmail.set($any($event.target).value)"
+                              class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
+                            />
+                          } @else {
+                            <span class="text-xs text-slate-400 font-mono" [class.line-through]="!s.isActive" [class.text-slate-500]="!s.isActive">
+                              {{ s.contactEmail }}
+                            </span>
+                          }
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                          <span
+                            [class.bg-emerald-500\/10]="s.isActive"
+                            [class.text-emerald-400]="s.isActive"
+                            [class.border-emerald-500\/20]="s.isActive"
+                            [class.bg-slate-800]="!s.isActive"
+                            [class.text-slate-400]="!s.isActive"
+                            [class.border-slate-700]="!s.isActive"
+                            class="inline-flex px-2.5 py-1 rounded-full text-xs font-bold border"
+                          >
+                            {{ s.isActive ? 'Activo' : 'Inactivo' }}
+                          </span>
+                        </td>
+                        @if (isAdminOrManager()) {
+                          <td class="px-6 py-4 text-right">
+                            <div class="flex justify-end gap-1.5">
+                              @if (editingSupplierId() === s.id) {
+                                <button (click)="saveSupplier(s)" class="p-1.5 text-emerald-400 hover:bg-emerald-950/20 rounded-lg cursor-pointer" title="Guardar Cambios">
+                                  <svg class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                  </svg>
+                                </button>
+                                <button (click)="cancelEdit()" class="p-1.5 text-slate-400 hover:bg-slate-850 rounded-lg cursor-pointer" title="Cancelar">
+                                  <svg class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                  </svg>
+                                </button>
+                              } @else {
+                                <button (click)="startEditSupplier(s)" class="p-1.5 text-amber-500 hover:bg-amber-950/20 rounded-lg cursor-pointer" title="Editar Proveedor">
+                                  <svg class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                  </svg>
+                                </button>
+                                <button (click)="toggleSupplierActive(s)" class="p-1.5 rounded-lg cursor-pointer" [class.text-rose-500]="s.isActive" [class.hover:bg-rose-950\/20]="s.isActive" [class.text-emerald-500]="!s.isActive" [class.hover:bg-emerald-950\/20]="!s.isActive" [title]="s.isActive ? 'Desactivar Proveedor' : 'Activar Proveedor'">
+                                  @if (s.isActive) {
+                                    <svg class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                      <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                                    </svg>
+                                  } @else {
+                                    <svg class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                  }
+                                </button>
+                              }
+                            </div>
+                          </td>
+                        }
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+          }
+
+        </div>
+      </div>
+
+    </div>
+  }
+</div>
