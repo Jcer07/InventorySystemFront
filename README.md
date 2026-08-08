@@ -1,59 +1,147 @@
-# InventorySystemFront
+# 💻 InventorySystemFront
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.0.4.
+Frontend del Sistema de Gestión de Inventarios desarrollado con **Angular**, **TypeScript** y **Tailwind CSS v4**.
 
-## Development server
+---
 
-To start a local development server, run:
+## 📋 Descripción del Proyecto
 
+`InventorySystemFront` es una aplicación web moderna, interactiva y con diseño responsive para el control y administración de inventarios. Proporciona una interfaz intuitiva para interactuar con la API REST de `InventorySystemBack`.
+
+### ✨ Características Principales
+
+- **Panel de Control (Dashboard)**: Métricas clave en tiempo real (total de productos, alertas de stock bajo, accesos rápidos a movimientos).
+- **Gestión de Productos**: Alta, edición, eliminación lógica, búsqueda y filtrado de productos con control de precios y stock.
+- **Movimientos de Inventario**: Registro sencillo de Entradas y Salidas de inventario con actualización automática del stock.
+- **Gestión de Catálogos**: Administración de Categorías, Unidades de Medida y Proveedores.
+- **Reportes en PDF**: Generación y visualización previa de reportes de inventario y movimientos.
+- **Autenticación Completa**: Inicio de sesión tradicional, registro de usuarios e integración con Google Sign-In.
+- **Diseño Moderno & Responsive**: Estilizado con Tailwind CSS v4, componentes accesibles y micro-interacciones.
+
+---
+
+## 🛠️ Tecnologías Utilizadas
+
+- **Framework**: Angular 19+ (Standalone Components, Signals, Reactive Forms)
+- **Lenguaje**: TypeScript
+- **Estilos**: Tailwind CSS v4 / PostCSS
+- **Manejo de Estado / Reactividad**: RxJS & Angular Signals
+- **Pruebas Unitarias**: Vitest / Angular Testing Utilities
+- **Servidor Dev / Proxy**: Angular CLI Development Server con `proxy.conf.json`
+
+---
+
+## 🏗️ Estructura del Proyecto
+
+```text
+InventorySystemFront/
+├── public/                 # Archivos estáticos e imágenes.
+├── src/
+│   ├── app/
+│   │   ├── core/           # Servicios core, guards de autenticación, interceptores HTTP.
+│   │   ├── features/       # Módulos y vistas principales de la aplicación:
+│   │   │   ├── auth/       # Pantallas de Login, Registro e integración con Google Auth.
+│   │   │   ├── dashboard/  # Vista principal con métricas y alertas.
+│   │   │   └── inventory/  # Control de productos, catálogos, movimientos y reportes.
+│   │   └── shared/         # Componentes reutilizables, modales, pipes y directivas.
+│   ├── app.config.ts       # Configuración global de providers (HttpClient, Router).
+│   ├── app.routes.ts       # Definición de rutas y protección con AuthGuard.
+│   └── app.css             # Estilos globales y directivas de Tailwind CSS.
+├── proxy.conf.json         # Configuración de proxy para redirigir peticiones /api al Backend.
+├── angular.json            # Configuración del proyecto Angular CLI.
+└── package.json            # Scripts de NPM y dependencias del proyecto.
+```
+
+---
+
+## ⚙️ Requisitos Previos
+
+Asegúrate de contar con los siguientes elementos instalados en tu sistema:
+
+- [Node.js](https://nodejs.org/) (versión 18.x, 20.x o superior recomendada)
+- `npm` (incluido con Node.js)
+- [Angular CLI](https://angular.dev/tools/cli) (opcional, instalable vía `npm install -g @angular/cli`)
+
+---
+
+## 🚀 Configuración y Ejecución Detallada
+
+### 1. Clonar el Repositorio
+
+```bash
+git clone https://github.com/tu-usuario/InventorySystemFront.git
+cd InventorySystemFront
+```
+
+### 2. Instalar Dependencias
+
+Ejecuta el siguiente comando para instalar las librerías necesarias:
+
+```bash
+npm install
+```
+
+### 3. Configuración de Proxy (Conexión con el Backend)
+
+Para evitar problemas de CORS durante el desarrollo local, el proyecto utiliza un proxy configurado en `proxy.conf.json`:
+
+```json
+{
+  "/api": {
+    "target": "https://localhost:7015",
+    "secure": false,
+    "changeOrigin": true
+  }
+}
+```
+
+> **Nota**: Si tu backend `InventorySystemBack` se ejecuta en un puerto diferente (por ejemplo, `http://localhost:5247`), actualiza la propiedad `"target"` en `proxy.conf.json`.
+
+### 4. Iniciar el Servidor de Desarrollo
+
+Ejecuta:
+
+```bash
+npm start
+```
+o
 ```bash
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Una vez compilado, la aplicación estará disponible en:
 
-## Code scaffolding
+👉 **[http://localhost:4200/](http://localhost:4200/)**
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+La aplicación se recargará automáticamente si realizas cambios en los archivos fuente.
 
-```bash
-ng generate component component-name
-```
+---
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## 🧪 Pruebas Unitarias
 
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
+Para ejecutar las pruebas unitarias con el ejecutor **Vitest**:
 
 ```bash
-ng build
+npm test
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+---
 
-## Running unit tests
+## 📦 Compilación para Producción
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+Para generar el bundle optimizado para despliegue en producción:
 
 ```bash
-ng test
+npm run build
 ```
 
-## Running end-to-end tests
+Los archivos resultantes se guardarán en el directorio `dist/inventory-system-front/`. Estos archivos pueden desplegarse en cualquier servidor web como Nginx, Apache, Vercel, Netlify o GitHub Pages.
 
-For end-to-end (e2e) testing, run:
+---
 
-```bash
-ng e2e
-```
+## 🔑 Credenciales de Prueba
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Para ingresar al sistema utilizando los datos generados por el backend:
 
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- **Usuario**: `admin@admin.com`
+- **Contraseña**: `Admin123`
