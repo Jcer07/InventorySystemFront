@@ -22,7 +22,7 @@ Frontend del Sistema de Gestión de Inventarios desarrollado con **Angular**, **
 
 ## 🛠️ Tecnologías Utilizadas
 
-- **Framework**: Angular 19+ (Standalone Components, Signals, Reactive Forms)
+- **Framework**: Angular 22 (Standalone Components, Signals, Reactive Forms)
 - **Lenguaje**: TypeScript
 - **Estilos**: Tailwind CSS v4 / PostCSS
 - **Manejo de Estado / Reactividad**: RxJS & Angular Signals
@@ -69,7 +69,7 @@ Asegúrate de contar con los siguientes elementos instalados en tu sistema:
 ### 1. Clonar el Repositorio
 
 ```bash
-git clone https://github.com/tu-usuario/InventorySystemFront.git
+git clone https://github.com/Jcer07/InventorySystemFront.git
 cd InventorySystemFront
 ```
 
@@ -95,9 +95,11 @@ Para evitar problemas de CORS durante el desarrollo local, el proyecto utiliza u
 }
 ```
 
-> **Nota**: Si tu backend `InventorySystemBack` se ejecuta en un puerto diferente (por ejemplo, `http://localhost:5247`), actualiza la propiedad `"target"` en `proxy.conf.json`.
+> **Nota**: Si tu backend `InventorySystemBack` se ejecuta en un puerto diferente, actualiza la propiedad `"target"` en `proxy.conf.json`.
 
-### 4. Iniciar el Servidor de Desarrollo
+### 4. Iniciar el Servidor de Desarrollo (HTTPS Obligatorio)
+
+> 🔒 **Importante**: La aplicación maneja la autenticación y sesiones de usuario mediante **cookies seguras** (`SameSite` / `HttpOnly`). Por esta razón, el servidor de desarrollo **debe ejecutarse obligatoriamente utilizando el protocolo HTTPS** (`https://localhost:4200`) para que las cookies de sesión se transmitan y almacenen correctamente entre el navegador y el servidor.
 
 Ejecuta:
 
@@ -106,36 +108,14 @@ npm start
 ```
 o
 ```bash
-ng serve
+ng serve --ssl
 ```
 
 Una vez compilado, la aplicación estará disponible en:
 
-👉 **[http://localhost:4200/](http://localhost:4200/)**
+👉 **[https://localhost:4200/](https://localhost:4200/)**
 
 La aplicación se recargará automáticamente si realizas cambios en los archivos fuente.
-
----
-
-## 🧪 Pruebas Unitarias
-
-Para ejecutar las pruebas unitarias con el ejecutor **Vitest**:
-
-```bash
-npm test
-```
-
----
-
-## 📦 Compilación para Producción
-
-Para generar el bundle optimizado para despliegue en producción:
-
-```bash
-npm run build
-```
-
-Los archivos resultantes se guardarán en el directorio `dist/inventory-system-front/`. Estos archivos pueden desplegarse en cualquier servidor web como Nginx, Apache, Vercel, Netlify o GitHub Pages.
 
 ---
 
